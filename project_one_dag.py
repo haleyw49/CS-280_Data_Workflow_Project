@@ -77,7 +77,7 @@ def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
 def upload_data_to_databox_func():
     databox_client = Client(Variable.get("DATABOX_TOKEN"))
 
-    fs = GCSFileSystem(project="Haley-Wiese-CS-280")
+    fs = GCSFileSystem(project="haley-wiese-cs-280")
     with fs.open('h-w-apache-airflow-cs280/data/user_data.csv', "r") as file_obj:
         user_df = pd.read_csv(file_obj)    
     for row in user_df.iterrows():
