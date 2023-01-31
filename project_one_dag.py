@@ -89,9 +89,9 @@ with DAG(
     catchup=False,
 ) as dag:
     start_task = DummyOperator(task_id="start_task")
-    my_task = PythonOperator(task_id="get_twitter_api_data_task", python_callable=get_twitter_api_data_func, provide_context=True)
-    my_task_two = PythonOperator(task_id="transform_twitter_api_data_task", python_callable=transform_twitter_api_data_func, provide_context=True)
-    my_task_three = PythonOperator(task_id="upload_data_to_databox_task", python_callable=upload_data_to_databox_func)
+    get_twitter_api_data_task = PythonOperator(task_id="get_twitter_api_data_task", python_callable=get_twitter_api_data_func, provide_context=True)
+    transform_twitter_api_data_task = PythonOperator(task_id="transform_twitter_api_data_task", python_callable=transform_twitter_api_data_func, provide_context=True)
+    upload_data_to_databox_task = PythonOperator(task_id="upload_data_to_databox_task", python_callable=upload_data_to_databox_func)
     end_task = DummyOperator(task_id="end_task")
 
-start_task >> my_task >> my_task_two >> my_task_three >> end_task
+start_task >> get_twitter_api_data_task >> transform_twitter_api_data_task >> upload_data_to_databox_task >> end_task
