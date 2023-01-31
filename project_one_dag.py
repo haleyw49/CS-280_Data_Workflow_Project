@@ -78,7 +78,7 @@ def upload_data_to_databox_func():
     user_blob = bucket.get_blob('data/user_data.csv')
     tweet_blob = bucket.get_blob('data/tweet_data')
     
-    databox_client = Client(Variable.get("DATABOX_TOKEN", deserialize_json=True))
+    databox_client = Client(Variable.get("DATABOX_TOKEN"))
     databox_client.push(user_blob, 5)
     databox_client.push(tweet_blob, 5)
 
