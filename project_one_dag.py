@@ -21,6 +21,7 @@ def get_twitter_api_data_func(ti: TaskInstance, **kwargs):
     for user_id in user_list:
         api_url = f"https://api.twitter.com/2/users/{user_id}?user.fields=public_metrics,profile_image_url,username,description,id"
         request = requests.get(api_url, headers=get_auth_header())
+        print(request.json())
         user_responses.append(request.json())
     ti.xcom_push("user requests", user_responses)
 
