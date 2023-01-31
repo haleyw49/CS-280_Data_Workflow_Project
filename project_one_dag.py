@@ -3,6 +3,7 @@ import logging as log
 import requests
 import pendulum
 import json
+import csv
 import pandas as pd 
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator
@@ -77,10 +78,22 @@ def upload_data_to_databox_func():
     bucket = google_client.get_bucket("h-w-apache-airflow-cs280")
     user_blob = bucket.get_blob('data/user_data.csv')
     tweet_blob = bucket.get_blob('data/tweet_data')
-    
     databox_client = Client(Variable.get("DATABOX_TOKEN"))
-    databox_client.push(user_blob, 5)
-    databox_client.push(tweet_blob, 5)
+    
+    reader = csv.reader(user_blob, delimiter=',')
+    for row in reader:
+        name = row[2]
+        databox_client.push(f"{name}_followers_count", row[3])
+        databox_client.push(f"{name}_following_count", row[4])
+        databox_client.push(f"{name}_tweet_count", row[5])
+        databox_client.push(f"{name}_listed_count", row[6])
+
+    reader = csv.reader(tweet_blob, delimiter=',')
+    for row in reader:
+        databox_client.push("reply_count", row[3])
+        databox_client.push("like_count", row[4])
+        databox_client.push("impression_count", row[5])
+        databox_client.push("retweet_count", row[6])
 
 
 with DAG(
