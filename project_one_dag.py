@@ -11,6 +11,7 @@ from airflow.models import Variable
 from airflow.models import TaskInstance
 from google.cloud import storage
 from databox import Client
+from gcsfs import GCSFileSystem
 
 def get_auth_header():
     my_bearer_token = Variable.get("TWITTER_BEARER_TOKEN")
@@ -83,7 +84,9 @@ def upload_data_to_databox_func():
     user_blob.download_to_filename("data/user_data.csv")
     tweet_blob.download_to_filename("data/tweet_data.csv")
 
-    user_df = pd.read_csv("data/user_data.csv")
+    fs = GCSFileSystem(project="Haley-Wiese-CS-280")
+    with fs.open('h-w-apache-airflow-cs280/data/user_data.csv', "r") as file_obj:
+        user_df = pd.read_csv(file_obj)    
     for row in user_df.iterrows():
         name = row['name']
         databox_client.push(f"{name}_followers_count", row['followers_count'])
@@ -91,7 +94,8 @@ def upload_data_to_databox_func():
         databox_client.push(f"{name}_tweet_count", row['tweet_count'])
         databox_client.push(f"{name}_listed_count", row['listed_count'])
 
-    tweet_df = pd.read_csv("data/tweet_data.csv")
+    with fs.open('h-w-apache-airflow-cs280/data/user_data.csv', "r") as file_obj:
+        tweet_df = pd.read_csv(file_obj)   
     for row in tweet_df.iterrows():
         databox_client.push("reply_count", row['reply_count'])
         databox_client.push("like_count", row['like_count'])
