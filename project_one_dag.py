@@ -12,9 +12,9 @@ from google.cloud import storage
 from databox import Client
 
 def get_auth_header():
-#   my_bearer_token = Variable.get("TWITTER_BEARER_TOKEN", deserialize_json=True)
-  my_bearer_token = "AAAAAAAAAAAAAAAAAAAAAI8plgEAAAAAlEJ%2BFeKPvHQtEywKJSLeI2KOpMk%3D1d0PGWhFGwJqlhjxvgYD3ZGQzR4rzFIby09Uhk9dlbrMExxciV"
-  return {"Authorization": f"Bearer {my_bearer_token}"}
+    my_bearer_token = Variable.get("TWITTER_BEARER_TOKEN")
+# my_bearer_token = "AAAAAAAAAAAAAAAAAAAAAI8plgEAAAAAlEJ%2BFeKPvHQtEywKJSLeI2KOpMk%3D1d0PGWhFGwJqlhjxvgYD3ZGQzR4rzFIby09Uhk9dlbrMExxciV"
+    return {"Authorization": f"Bearer {my_bearer_token}"}
 
 def get_twitter_api_data_func(ti: TaskInstance, **kwargs):
     user_list = Variable.get(f"TWITTER_USER_IDS", [], deserialize_json=True)
@@ -22,7 +22,6 @@ def get_twitter_api_data_func(ti: TaskInstance, **kwargs):
     for user_id in user_list:
         api_url = f"https://api.twitter.com/2/users/{user_id}?user.fields=public_metrics,profile_image_url,username,description,id"
         request = requests.get(api_url, headers=get_auth_header())
-        print(request.json())
         user_responses.append(request.json())
     ti.xcom_push("user requests", user_responses)
 
@@ -34,8 +33,8 @@ def get_twitter_api_data_func(ti: TaskInstance, **kwargs):
         tweet_responses.append(request.json())
     ti.xcom_push("tweet requests", tweet_responses)
 
-    logging.info(user_responses)
-    logging.info(tweet_responses)
+    log.info(user_responses)
+    log.info(tweet_responses)
 
 
 def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
@@ -91,9 +90,9 @@ with DAG(
     catchup=False,
 ) as dag:
     start_task = DummyOperator(task_id="start_task")
-    get_twitter_api_data_task = PythonOperator(task_id="get_twitter_api_data_task", python_callable=get_twitter_api_data_func, provide_context=True)
-    transform_twitter_api_data_task = PythonOperator(task_id="transform_twitter_api_data_task", python_callable=transform_twitter_api_data_func, provide_context=True)
-    upload_data_to_databox_task = PythonOperator(task_id="upload_data_to_databox_task", python_callable=upload_data_to_databox_func)
+    first_task = PythonOperator(task_id="get_twitter_api_data_task", python_callable=get_twitter_api_data_func, provide_context=True)
+    second_task = PythonOperator(task_id="transform_twitter_api_data_task", python_callable=transform_twitter_api_data_func, provide_context=True)
+    third_task = PythonOperator(task_id="upload_data_to_databox_task", python_callable=upload_data_to_databox_func)
     end_task = DummyOperator(task_id="end_task")
 
-start_task >> get_twitter_api_data_task >> transform_twitter_api_data_task >> upload_data_to_databox_task >> end_task
+start_task >> first_task >> second_task >> third_task >> end_task
