@@ -76,13 +76,6 @@ def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
 
 def upload_data_to_databox_func():
     databox_client = Client(Variable.get("DATABOX_TOKEN"))
-    google_client = storage.Client()
-    
-    bucket = google_client.get_bucket("h-w-apache-airflow-cs280")
-    user_blob = bucket.blob('data/user_data.csv')
-    tweet_blob = bucket.blob('data/tweet_data')
-    user_blob.download_to_filename("data/user_data.csv")
-    tweet_blob.download_to_filename("data/tweet_data.csv")
 
     fs = GCSFileSystem(project="Haley-Wiese-CS-280")
     with fs.open('h-w-apache-airflow-cs280/data/user_data.csv', "r") as file_obj:
