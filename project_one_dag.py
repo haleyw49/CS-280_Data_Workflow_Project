@@ -78,24 +78,22 @@ def upload_data_to_databox_func():
     bucket = google_client.get_bucket("h-w-apache-airflow-cs280")
     user_blob = bucket.get_blob('data/user_data.csv')
     tweet_blob = bucket.get_blob('data/tweet_data')
-    # user_path = "gs://h-w-apache-airflow-cs280/data/user_data.csv"
-    # tweet_path = "gs://h-w-apache-airflow-cs280/data/user_data.csv"
     databox_client = Client(Variable.get("DATABOX_TOKEN"))
     
-    user_df = pd.read_csv(user_blob)
-    for row in user_df.iterrows():
-        name = row['name']
-        databox_client.push(f"{name}_followers_count", row['followers_count'])
-        databox_client.push(f"{name}_following_count", row['following_count'])
-        databox_client.push(f"{name}_tweet_count", row['tweet_count'])
-        databox_client.push(f"{name}_listed_count", row['listed_count'])
+    with user_blob.open("r") as file:
+        for row in file:
+            name = row[2]
+            databox_client.push(f"{name}_followers_count", row[3])
+            databox_client.push(f"{name}_following_count", row[4])
+            databox_client.push(f"{name}_tweet_count", row[5])
+            databox_client.push(f"{name}_listed_count", row[6])
 
-    tweet_df = pd.read_csv(tweet_blob)
-    for row in tweet_df.iterrows():
-        databox_client.push("reply_count", row['reply_count'])
-        databox_client.push("like_count", row['like_count'])
-        databox_client.push("impression_count", row['impression_count'])
-        databox_client.push("retweet_count", row['retweet_count'])
+    with tweet_blob.open("r") as file:
+        for row in file:
+            databox_client.push("reply_count", row[3])
+            databox_client.push("like_count", row[4])
+            databox_client.push("impression_count", row[5])
+            databox_client.push("retweet_count", row[6])
 
 
 with DAG(
