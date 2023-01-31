@@ -12,7 +12,8 @@ from google.cloud import storage
 from databox import Client
 
 def get_auth_header():
-  my_bearer_token = Variable.get("TWITTER_BEARER_TOKEN", deserialize_json=True)
+#   my_bearer_token = Variable.get("TWITTER_BEARER_TOKEN", deserialize_json=True)
+  my_bearer_token = "AAAAAAAAAAAAAAAAAAAAAI8plgEAAAAAlEJ%2BFeKPvHQtEywKJSLeI2KOpMk%3D1d0PGWhFGwJqlhjxvgYD3ZGQzR4rzFIby09Uhk9dlbrMExxciV"
   return {"Authorization": f"Bearer {my_bearer_token}"}
 
 def get_twitter_api_data_func(ti: TaskInstance, **kwargs):
