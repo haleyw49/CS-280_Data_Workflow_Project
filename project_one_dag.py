@@ -79,21 +79,30 @@ def upload_data_to_databox_func():
 
     fs = GCSFileSystem(project="haley-wiese-cs-280")
     with fs.open('h-w-apache-airflow-cs280/data/user_data.csv', "r") as file_obj:
-        user_df = pd.read_csv(file_obj)    
-    for row in user_df.iterrows():
-        name = row['name']
-        databox_client.push(f"{name}_followers_count", row['followers_count'])
-        databox_client.push(f"{name}_following_count", row['following_count'])
-        databox_client.push(f"{name}_tweet_count", row['tweet_count'])
-        databox_client.push(f"{name}_listed_count", row['listed_count'])
-
+        user_df = pd.read_csv(file_obj)
     with fs.open('h-w-apache-airflow-cs280/data/user_data.csv', "r") as file_obj:
-        tweet_df = pd.read_csv(file_obj)   
-    for row in tweet_df.iterrows():
-        databox_client.push("reply_count", row['reply_count'])
-        databox_client.push("like_count", row['like_count'])
-        databox_client.push("impression_count", row['impression_count'])
-        databox_client.push("retweet_count", row['retweet_count'])
+        tweet_df = pd.read_csv(file_obj)
+
+    user_set = set(user_df['user_id'])
+    tweet_set = set(tweet_df['tweet_id'])
+
+    for user in user_set:
+        user = user_df[user_df['user_id'] == user].iloc[-1]
+        user = user.to_dict()
+
+        databox_client.push(f"{user['username']} : followers_count", user['followers_count'])
+        databox_client.push(f"{user['username']} : following_count", user['following_count'])
+        databox_client.push(f"{user['username']} : tweet_count", user['tweet_count'])
+        databox_client.push(f"{user['username']} : listed_count", user['listed_count'])
+  
+    for tweet in tweet_set:
+        tweet = tweet_df[tweet_df['tweet_id'] == tweet].iloc[-1]
+        tweet = tweet.to_dict()
+
+        databox_client.push("reply_count", tweet['reply_count'])
+        databox_client.push("like_count", tweet['like_count'])
+        databox_client.push("impression_count", tweet['impression_count'])
+        databox_client.push("retweet_count", tweet['retweet_count'])
 
 
 with DAG(
