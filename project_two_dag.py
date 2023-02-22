@@ -9,10 +9,20 @@ from models.user import User
 def first_task_function():
     log.info("load_data_task")
     session = Session()
+
     # This will retrieve all of the users from the database 
     # (It'll be a list, so you may have 100 users or 0 users)
-    allUsers = session.query(User).all()
-    log.info(allUsers.user_id)
+    session.query(User).all() 
+
+    # This will retrieve the user who's username is NASA
+    espnUser = session.query(User).filter(User.username == "espn").first()
+
+    #You can then print the username of the user you retrieved
+    print(espnUser.username)
+
+    #We recommend that you reassign the user to a variable so that you can use it later
+    nasaUsername = espnUser.username
+
     # This will close the session that you opened at the beginning of the file.
     session.close()
     
