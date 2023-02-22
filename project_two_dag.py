@@ -12,18 +12,11 @@ def first_task_function():
 
     # This will retrieve all of the users from the database 
     # (It'll be a list, so you may have 100 users or 0 users)
-    session.query(User).all() 
+    all_users = session.query(User).all() 
+    log.info(all_users)
+    all_user_ids = all_users.user_id
+    log.info(all_user_ids)
 
-    # This will retrieve the user who's username is NASA
-    espnUser = session.query(User).filter(User.username == "espn").first()
-
-    #You can then print the username of the user you retrieved
-    print(espnUser.username)
-
-    #We recommend that you reassign the user to a variable so that you can use it later
-    nasaUsername = espnUser.username
-
-    # This will close the session that you opened at the beginning of the file.
     session.close()
     
     return
