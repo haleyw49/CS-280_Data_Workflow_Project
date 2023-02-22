@@ -14,8 +14,11 @@ def first_task_function():
     # (It'll be a list, so you may have 100 users or 0 users)
     all_users = session.query(User).all() 
     log.info(all_users)
-    all_user_ids = all_users.user_id
-    log.info(all_user_ids)
+    user_id_list = []
+    for user in all_users:
+        user_id_list.append(user.user_id)
+
+    log.info(user_id_list)
 
     session.close()
     
