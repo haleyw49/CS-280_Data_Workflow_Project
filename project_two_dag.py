@@ -8,9 +8,7 @@ from models.user import User
 
 def first_task_function():
     log.info("load_data_task")
-
     session = Session()
-
     # This will retrieve all of the users from the database 
     # (It'll be a list, so you may have 100 users or 0 users)
     allUsers = session.query(User).all() 
@@ -35,7 +33,7 @@ def fourth_task_function():
 with DAG(
     dag_id="project_two_dag",
     schedule_interval="0 9 * * *",
-    start_date=pendulum.datetime(2023, 2, 26, tz="US/Pacific"),
+    start_date=pendulum.datetime(2023, 1, 1, tz="US/Pacific"),
     catchup=False,
 ) as dag:
     start_task = DummyOperator(task_id="start_task")
