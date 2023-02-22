@@ -1,28 +1,40 @@
 from airflow import DAG
 import logging as log
+import requests
 import pendulum
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator
+from airflow.models import TaskInstance
+from airflow.models import Variable
+
 from models.config import Session #You would import this from your config file
 from models.user import User
 
-def first_task_function():
+def first_task_function(ti: TaskInstance, **kwargs):
     log.info("load_data_task")
+    
     session = Session()
-
-    # This will retrieve all of the users from the database 
-    # (It'll be a list, so you may have 100 users or 0 users)
     all_users = session.query(User).all() 
-    log.info(all_users)
+    
     user_id_list = []
     for user in all_users:
         user_id_list.append(user.user_id)
+    ti.xcom_push("user ids", user_id_list)
 
-    log.info(user_id_list)
-
-    session.close()
+    tweet_id_list = []
+    for id in user_id_list:
+        tweets_url = f'https://api.twitter.com/1.1/statuses/user_timeline.json'
+        response = requests.get(tweets_url, headers=get_auth_header(), params={"user_id": id, "count": 2})
+        tweet_id_list.append(response.json())
+    log.info(tweet_id_list)
+    ti.xcom_push("tweet ids", tweet_id_list)
     
+    session.close()
     return
+
+def get_auth_header():
+    my_bearer_token = Variable.get("TWITTER_BEARER_TOKEN")
+    return {"Authorization": f"Bearer {my_bearer_token}"}
 
 def second_task_function():
     log.info("This is your second task")
