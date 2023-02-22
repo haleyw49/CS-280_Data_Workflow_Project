@@ -11,8 +11,8 @@ def first_task_function():
     session = Session()
     # This will retrieve all of the users from the database 
     # (It'll be a list, so you may have 100 users or 0 users)
-    allUsers = session.query(User).all() 
-    log.info(allUsers)
+    allUsers = session.query(User).all()
+    log.info(allUsers.user_id)
     # This will close the session that you opened at the beginning of the file.
     session.close()
     
