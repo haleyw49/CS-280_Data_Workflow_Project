@@ -26,7 +26,7 @@ def first_task_function(ti: TaskInstance, **kwargs):
         tweets_url = f'https://api.twitter.com/1.1/statuses/user_timeline.json'
         response = requests.get(tweets_url, headers=get_auth_header(), params={"user_id": id, "count": 2})
         tweet_info = response.json()
-        tweet_id_list.append(tweet_info.id_str)
+        tweet_id_list.append(tweet_info['id_str'])
     log.info(tweet_id_list)
     ti.xcom_push("tweet ids", tweet_id_list)
     
