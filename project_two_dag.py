@@ -170,7 +170,7 @@ def fourth_task_function():
 with DAG(
     dag_id="project_two_dag",
     schedule_interval="0 9 * * *",
-    start_date=pendulum.datetime(2023, 1, 1, tz="US/Pacific"),
+    start_date=pendulum.datetime(2023,2, 26, tz="US/Pacific"),
     catchup=False,
 ) as dag:
     start_task = DummyOperator(task_id="start_task")
